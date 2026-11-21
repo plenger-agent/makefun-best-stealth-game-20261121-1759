@@ -11,8 +11,14 @@ import { buildDossier } from './vendor/makefun-game.ts';
 const repoRoot = dirname(fileURLToPath(new URL('./main.ts', import.meta.url)));
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });
+
+// Clear only the outputs this program writes, inside the output directory:
+// the directory itself belongs to the runner (in the grader it is a mount
+// point the entry may not delete), so never remove outputDir as a whole.
+for (const name of ['game', 'screenshots', 'dossier.json']) {
+  rmSync(join(outputDir, name), { recursive: true, force: true });
+}
 
 for (const folder of ['game', 'screenshots']) {
   const source = join(repoRoot, folder);
